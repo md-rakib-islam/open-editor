@@ -50,6 +50,63 @@ Download the files directly and include them in your project:
 
 ## Quick Start
 
+### React Component (Recommended)
+
+Import and use the React component:
+
+```jsx
+import React, { useState, useRef } from 'react';
+import { Editor } from 'trendymc';
+
+function App() {
+  const [content, setContent] = useState('<p>Hello TrendyMC!</p>');
+  const editorRef = useRef(null);
+
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
+    console.log('Content:', newContent);
+  };
+
+  return (
+    <div>
+      <h1>My Editor</h1>
+      <Editor
+        initialValue={content}
+        onChange={handleEditorChange}
+        height={500}
+        ref={editorRef}
+      />
+      <button onClick={() => console.log(editorRef.current.getContent())}>
+        Get Content
+      </button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+**Props:**
+- `initialValue` - Initial content (uncontrolled)
+- `value` - Controlled content (use with onChange)
+- `onChange` - Callback when content changes
+- `onInit` - Callback when editor initializes
+- `onBlur` - Callback when editor loses focus
+- `onFocus` - Callback when editor gains focus
+- `height` - Editor height in pixels (default: 500)
+- `inline` - Enable inline editing mode
+- `disabled` - Disable the editor
+- `toolbar` - Custom toolbar configuration
+- `plugins` - Array of plugin names
+- `init` - Additional TrendyMC configuration options
+
+**Ref Methods:**
+- `getContent()` - Get current content
+- `setContent(content)` - Set content
+- `insertContent(content)` - Insert content at cursor
+- `focus()` - Focus the editor
+- `getEditor()` - Get the raw TrendyMC editor instance
+
 ### Using with npm/ES6 Modules
 
 ```javascript

@@ -2,9 +2,11 @@
   "name": "trendymc",
   "version": "1.0.1",
   "description": "TrendyMC - A modern, feature-rich rich text editor based on TinyMCE. Powerful WYSIWYG editor with extensive plugin support, multiple themes, and comprehensive customization options.",
-  "main": "js/trendymc/trendymc.min.js",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "types": "js/trendymc/trendymc.d.ts",
   "files": [
+    "src/**/*",
     "js/trendymc/**/*",
     "README.md",
     "CHANGELOG.md",
@@ -29,7 +31,10 @@
     "visual-editor",
     "content-editor",
     "javascript",
-    "typescript"
+    "typescript",
+    "react",
+    "react-component",
+    "react-editor"
   ],
   "author": {
     "name": "Rakibul Islam Morsalin",
@@ -49,6 +54,18 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {},
   "dependencies": {}
