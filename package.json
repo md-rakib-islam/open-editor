@@ -1,6 +1,6 @@
 {
   "name": "trendymc",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "TrendyMC - A modern, feature-rich rich text editor based on TinyMCE. Powerful WYSIWYG editor with extensive plugin support, multiple themes, and comprehensive customization options.",
   "main": "src/index.js",
   "module": "src/index.js",
