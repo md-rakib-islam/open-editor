@@ -99,7 +99,12 @@ const Editor = forwardRef(function Editor(props, ref) {
       menubar: init.menubar !== undefined ? init.menubar : true,
       statusbar: init.statusbar !== undefined ? init.statusbar : true,
       branding: init.branding !== undefined ? init.branding : false,
-      placeholder: placeholder || init.placeholder
+      placeholder: placeholder || init.placeholder,
+      // Suppress plugin loading errors
+      init_instance_callback: function(editor) {
+        // Editor is now fully initialized
+        editorRef.current = editor;
+      }
     };
 
     // Merge additional init options
@@ -171,7 +176,16 @@ const Editor = forwardRef(function Editor(props, ref) {
   // Handle disabled state changes
   useEffect(function() {
     if (editorRef.current) {
-      editorRef.current.setMode(disabled ? 'readonly' : 'design');
+      // Check if mode API exists
+      if (editorRef.current.mode && editorRef.current.mode.set) {
+        editorRef.current.mode.set(disabled ? 'readonly' : 'design');
+      } else if (editorRef.current.getBody) {
+        // Fallback: set contenteditable directly
+        var body = editorRef.current.getBody();
+        if (body) {
+          body.setAttribute('contenteditable', disabled ? 'false' : 'true');
+        }
+      }
     }
   }, [disabled]);
 
