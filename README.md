@@ -16,9 +16,71 @@ TrendyMC is a rebranded version of the TinyMCE rich text editor, designed to pro
 - **Accessibility**: Built with accessibility standards in mind
 - **Customizable**: Extensive API for customization and extension
 
+## Installation
+
+### npm
+
+Install TrendyMC via npm:
+
+```bash
+npm install trendymc
+```
+
+Or using yarn:
+
+```bash
+yarn add trendymc
+```
+
+### CDN
+
+You can also use TrendyMC via jsDelivr CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/trendymc@latest/js/trendymc/trendymc.min.js"></script>
+```
+
+### Direct Download
+
+Download the files directly and include them in your project:
+
+```html
+<script src="path/to/js/trendymc/trendymc.min.js"></script>
+```
+
 ## Quick Start
 
-### Basic Usage
+### Using with npm/ES6 Modules
+
+```javascript
+// Import TrendyMC
+import 'trendymc';
+
+// Initialize editor
+trendymc.init({
+    selector: '#editor',
+    license_key: 'gpl',
+    plugins: 'lists link image',
+    toolbar: 'undo redo | bold italic'
+});
+```
+
+### Using with Node.js/CommonJS
+
+```javascript
+// Require TrendyMC
+require('trendymc');
+
+// Initialize editor
+trendymc.init({
+    selector: '#editor',
+    license_key: 'gpl',
+    plugins: 'lists link image',
+    toolbar: 'undo redo | bold italic'
+});
+```
+
+### Basic HTML Usage
 
 Include TrendyMC in your HTML:
 
@@ -210,14 +272,6 @@ TrendyMC supports all modern browsers:
 - Firefox (latest)
 - Safari (latest)
 - Opera (latest)
-
-## CDN Usage
-
-You can also use TrendyMC via jsDelivr CDN:
-
-```html
-<script src="https://cdn.jsdelivr.net/gh/[your-username]/[repo-name]@latest/js/trendymc/trendymc.min.js"></script>
-```
 
 ## Development
 

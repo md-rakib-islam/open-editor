@@ -1,0 +1,55 @@
+{
+  "name": "trendymc",
+  "version": "1.0.0",
+  "description": "TrendyMC - A modern, feature-rich rich text editor based on TinyMCE. Powerful WYSIWYG editor with extensive plugin support, multiple themes, and comprehensive customization options.",
+  "main": "js/trendymc/trendymc.min.js",
+  "types": "js/trendymc/trendymc.d.ts",
+  "files": [
+    "js/trendymc/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "echo \"Preparing to publish TrendyMC...\"",
+    "version": "echo \"Current version: $npm_package_version\""
+  },
+  "keywords": [
+    "editor",
+    "wysiwyg",
+    "rich-text",
+    "text-editor",
+    "html-editor",
+    "contenteditable",
+    "trendymc",
+    "tinymce",
+    "rich-text-editor",
+    "wysiwyg-editor",
+    "visual-editor",
+    "content-editor",
+    "javascript",
+    "typescript"
+  ],
+  "author": {
+    "name": "Rakibul Islam Morsalin",
+    "url": "https://www.linkedin.com/in/rakibul-islam-morsalin-425855294/"
+  },
+  "license": "GPL-2.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/trendymc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/trendymc/issues"
+  },
+  "homepage": "https://github.com/yourusername/trendymc#readme",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
