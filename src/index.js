@@ -1,5 +1,5 @@
 // TrendyMC React Components
-import Editor from './react/Editor.jsx';
+const Editor = require('./react/Editor.jsx');
 
 // Load TrendyMC core
 if (typeof window !== 'undefined' && !window.trendymc) {
@@ -8,7 +8,9 @@ if (typeof window !== 'undefined' && !window.trendymc) {
 }
 
 // Export React component
-export { Editor };
+module.exports = {
+  Editor: Editor
+};
 
 // Default export
-export default Editor;
+module.exports.default = Editor;

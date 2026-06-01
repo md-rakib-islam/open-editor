@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+const React = require('react');
+const { useRef, useEffect, forwardRef, useImperativeHandle } = React;
 
 /**
  * TrendyMC Editor Component for React
@@ -21,14 +22,14 @@ import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react
  * @param {Array} props.plugins - Array of plugin names
  * @param {Object} props.init - Additional TrendyMC init options
  */
-const Editor = forwardRef((props, ref) => {
+const Editor = forwardRef(function Editor(props, ref) {
   const {
     id,
     initialValue = '',
     value,
     onInit,
     onChange,
-    onEditorChange, // TinyMCE-style prop
+    onEditorChange,
     onBlur,
     onFocus,
     placeholder,
@@ -53,27 +54,33 @@ const Editor = forwardRef((props, ref) => {
   const handleContentChange = onEditorChange || onChange;
 
   // Expose editor methods to parent via ref
-  useImperativeHandle(ref, () => ({
-    getContent: () => (editorRef.current ? editorRef.current.getContent() : ''),
-    setContent: (content) => {
-      if (editorRef.current) {
-        editorRef.current.setContent(content);
+  useImperativeHandle(ref, function() {
+    return {
+      getContent: function() {
+        return editorRef.current ? editorRef.current.getContent() : '';
+      },
+      setContent: function(content) {
+        if (editorRef.current) {
+          editorRef.current.setContent(content);
+        }
+      },
+      insertContent: function(content) {
+        if (editorRef.current) {
+          editorRef.current.insertContent(content);
+        }
+      },
+      focus: function() {
+        if (editorRef.current) {
+          editorRef.current.focus();
+        }
+      },
+      getEditor: function() {
+        return editorRef.current;
       }
-    },
-    insertContent: (content) => {
-      if (editorRef.current) {
-        editorRef.current.insertContent(content);
-      }
-    },
-    focus: () => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-      }
-    },
-    getEditor: () => editorRef.current,
-  }));
+    };
+  });
 
-  useEffect(() => {
+  useEffect(function() {
     // Check if TrendyMC is available
     if (typeof window === 'undefined' || !window.trendymc) {
       console.error('TrendyMC is not loaded. Make sure to import the TrendyMC script.');
@@ -84,60 +91,69 @@ const Editor = forwardRef((props, ref) => {
     const initConfig = {
       target: elementRef.current,
       license_key: 'gpl',
-      height,
-      inline,
-      disabled,
-      toolbar,
-      plugins,
+      height: height,
+      inline: inline,
+      disabled: disabled,
+      toolbar: toolbar,
+      plugins: plugins,
       menubar: init.menubar !== undefined ? init.menubar : true,
       statusbar: init.statusbar !== undefined ? init.statusbar : true,
       branding: init.branding !== undefined ? init.branding : false,
-      placeholder: placeholder || init.placeholder,
-      ...init,
-      setup: (editor) => {
-        editorRef.current = editor;
+      placeholder: placeholder || init.placeholder
+    };
 
-        // Call user's setup if provided
-        if (init.setup) {
-          init.setup(editor);
+    // Merge additional init options
+    for (var key in init) {
+      if (init.hasOwnProperty(key)) {
+        initConfig[key] = init[key];
+      }
+    }
+
+    // Override setup to add our handlers
+    const userSetup = init.setup;
+    initConfig.setup = function(editor) {
+      editorRef.current = editor;
+
+      // Call user's setup if provided
+      if (userSetup) {
+        userSetup(editor);
+      }
+
+      // Handle initialization - TinyMCE passes (evt, editor)
+      editor.on('init', function(evt) {
+        if (onInit) {
+          // Support TinyMCE-style (evt, editor) signature
+          onInit(evt, editor);
         }
+      });
 
-        // Handle initialization - TinyMCE passes (evt, editor)
-        editor.on('init', (evt) => {
-          if (onInit) {
-            // Support TinyMCE-style (evt, editor) signature
-            onInit(evt, editor);
-          }
+      // Handle content changes
+      editor.on('change keyup setcontent', function() {
+        if (handleContentChange) {
+          // TinyMCE passes (content, editor)
+          handleContentChange(editor.getContent(), editor);
+        }
+      });
+
+      // Handle blur event
+      if (onBlur) {
+        editor.on('blur', function(evt) {
+          onBlur(evt, editor);
         });
+      }
 
-        // Handle content changes
-        editor.on('change keyup setcontent', () => {
-          if (handleContentChange) {
-            // TinyMCE passes (content, editor)
-            handleContentChange(editor.getContent(), editor);
-          }
+      // Handle focus event
+      if (onFocus) {
+        editor.on('focus', function(evt) {
+          onFocus(evt, editor);
         });
-
-        // Handle blur event
-        if (onBlur) {
-          editor.on('blur', (evt) => {
-            onBlur(evt, editor);
-          });
-        }
-
-        // Handle focus event
-        if (onFocus) {
-          editor.on('focus', (evt) => {
-            onFocus(evt, editor);
-          });
-        }
       }
     };
 
     window.trendymc.init(initConfig);
 
     // Cleanup on unmount
-    return () => {
+    return function() {
       if (editorRef.current) {
         editorRef.current.remove();
         editorRef.current = null;
@@ -146,14 +162,14 @@ const Editor = forwardRef((props, ref) => {
   }, []); // Only run on mount
 
   // Handle controlled component updates
-  useEffect(() => {
+  useEffect(function() {
     if (isControlled && editorRef.current && value !== editorRef.current.getContent()) {
       editorRef.current.setContent(value || '');
     }
   }, [value, isControlled]);
 
   // Handle disabled state changes
-  useEffect(() => {
+  useEffect(function() {
     if (editorRef.current) {
       editorRef.current.setMode(disabled ? 'readonly' : 'design');
     }
@@ -161,25 +177,21 @@ const Editor = forwardRef((props, ref) => {
 
   // Render textarea or div based on inline mode
   if (inline) {
-    return (
-      <div
-        ref={elementRef}
-        id={id}
-        dangerouslySetInnerHTML={{ __html: initialValue }}
-      />
-    );
+    return React.createElement('div', {
+      ref: elementRef,
+      id: id,
+      dangerouslySetInnerHTML: { __html: initialValue }
+    });
   }
 
-  return (
-    <textarea
-      ref={elementRef}
-      id={id}
-      defaultValue={initialValue}
-      style={{ visibility: 'hidden' }}
-    />
-  );
+  return React.createElement('textarea', {
+    ref: elementRef,
+    id: id,
+    defaultValue: initialValue,
+    style: { visibility: 'hidden' }
+  });
 });
 
 Editor.displayName = 'TrendyMCEditor';
 
-export default Editor;
+module.exports = Editor;
