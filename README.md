@@ -52,7 +52,9 @@ Download the files directly and include them in your project:
 
 ### React Component (Recommended)
 
-Import and use the React component:
+TrendyMC provides a React component that's **100% compatible with TinyMCE React API**.
+
+#### Basic Example
 
 ```jsx
 import React, { useState, useRef } from 'react';
@@ -62,7 +64,7 @@ function App() {
   const [content, setContent] = useState('<p>Hello TrendyMC!</p>');
   const editorRef = useRef(null);
 
-  const handleEditorChange = (newContent) => {
+  const handleEditorChange = (newContent, editor) => {
     setContent(newContent);
     console.log('Content:', newContent);
   };
@@ -72,7 +74,7 @@ function App() {
       <h1>My Editor</h1>
       <Editor
         initialValue={content}
-        onChange={handleEditorChange}
+        onEditorChange={handleEditorChange}
         height={500}
         ref={editorRef}
       />
@@ -86,26 +88,224 @@ function App() {
 export default App;
 ```
 
-**Props:**
-- `initialValue` - Initial content (uncontrolled)
-- `value` - Controlled content (use with onChange)
-- `onChange` - Callback when content changes
-- `onInit` - Callback when editor initializes
-- `onBlur` - Callback when editor loses focus
-- `onFocus` - Callback when editor gains focus
-- `height` - Editor height in pixels (default: 500)
-- `inline` - Enable inline editing mode
-- `disabled` - Disable the editor
-- `toolbar` - Custom toolbar configuration
-- `plugins` - Array of plugin names
-- `init` - Additional TrendyMC configuration options
+#### TinyMCE-Compatible Syntax (Drop-in Replacement)
 
-**Ref Methods:**
-- `getContent()` - Get current content
-- `setContent(content)` - Set content
-- `insertContent(content)` - Insert content at cursor
-- `focus()` - Focus the editor
-- `getEditor()` - Get the raw TrendyMC editor instance
+If you're migrating from `@tinymce/tinymce-react`, your code works as-is:
+
+```jsx
+import React, { useRef } from 'react';
+import { Editor } from 'trendymc';
+
+function MyForm() {
+  const editorRef = useRef(null);
+
+  const log = (content, editor) => {
+    console.log('Content:', content);
+  };
+
+  return (
+    <Editor
+      value={field.value}
+      onInit={(evt, editor) => (editorRef.current = editor)}
+      placeholder="Enter your content here..."
+      onEditorChange={log}
+      id="my-editor"
+      init={{
+        height: 500,
+        menubar: false,
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'image',
+          'charmap', 'preview', 'anchor', 'searchreplace',
+          'visualblocks', 'code', 'fullscreen', 'insertdatetime',
+          'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | ' +
+          'bold italic forecolor | alignleft aligncenter ' +
+          'alignright alignjustify | bullist numlist outdent indent | ' +
+          'removeformat | help',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+      }}
+    />
+  );
+}
+```
+
+#### Controlled Component Example
+
+```jsx
+import React, { useState } from 'react';
+import { Editor } from 'trendymc';
+
+function ControlledEditor() {
+  const [content, setContent] = useState('<p>Initial content</p>');
+
+  return (
+    <div>
+      <Editor
+        value={content}
+        onEditorChange={(newContent) => setContent(newContent)}
+      />
+      <button onClick={() => setContent('<p>Reset content</p>')}>
+        Reset
+      </button>
+    </div>
+  );
+}
+```
+
+#### With Form Integration (React Hook Form, Formik, etc.)
+
+```jsx
+import React from 'react';
+import { Editor } from 'trendymc';
+import { Controller, useForm } from 'react-hook-form';
+
+function FormWithEditor() {
+  const { control, handleSubmit } = useForm();
+
+  const onSubmit = (data) => {
+    console.log('Form data:', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <Editor
+            value={field.value}
+            onEditorChange={field.onChange}
+            placeholder="Enter description..."
+            init={{
+              height: 400,
+              menubar: false,
+              plugins: 'lists link image',
+              toolbar: 'undo redo | bold italic | bullist numlist'
+            }}
+          />
+        )}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+## React Component API Reference
+
+### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `id` | `string` | Unique ID for the editor instance |
+| `initialValue` | `string` | Initial content (uncontrolled mode) |
+| `value` | `string` | Current content (controlled mode) |
+| `onEditorChange` | `(content: string, editor: Editor) => void` | Callback when content changes (TinyMCE-style) |
+| `onChange` | `(content: string, editor: Editor) => void` | Callback when content changes (alternative) |
+| `onInit` | `(evt: Event, editor: Editor) => void` | Callback when editor initializes |
+| `onBlur` | `(evt: Event, editor: Editor) => void` | Callback when editor loses focus |
+| `onFocus` | `(evt: Event, editor: Editor) => void` | Callback when editor gains focus |
+| `placeholder` | `string` | Placeholder text when editor is empty |
+| `height` | `number` | Editor height in pixels (default: 500) |
+| `inline` | `boolean` | Enable inline editing mode |
+| `disabled` | `boolean` | Disable the editor (readonly mode) |
+| `toolbar` | `string` | Toolbar configuration |
+| `plugins` | `string[]` | Array of plugin names to enable |
+| `init` | `object` | Additional TrendyMC configuration options |
+
+### Ref Methods
+
+Access these methods via `ref.current`:
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getContent()` | `string` | Get current HTML content |
+| `setContent(content)` | `void` | Set HTML content |
+| `insertContent(content)` | `void` | Insert content at cursor position |
+| `focus()` | `void` | Focus the editor |
+| `getEditor()` | `Editor` | Get raw TrendyMC editor instance |
+
+### Example with All Features
+
+```jsx
+import React, { useRef, useState } from 'react';
+import { Editor } from 'trendymc';
+
+function AdvancedEditor() {
+  const editorRef = useRef(null);
+  const [content, setContent] = useState('');
+  const [wordCount, setWordCount] = useState(0);
+
+  const handleInit = (evt, editor) => {
+    console.log('Editor initialized:', editor);
+    editorRef.current = editor;
+  };
+
+  const handleChange = (newContent, editor) => {
+    setContent(newContent);
+    setWordCount(editor.plugins.wordcount.body.getWordCount());
+  };
+
+  const insertCustomContent = () => {
+    editorRef.current.insertContent('<p><strong>Custom content inserted!</strong></p>');
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: '10px' }}>
+        Words: {wordCount}
+      </div>
+
+      <Editor
+        id="advanced-editor"
+        value={content}
+        onInit={handleInit}
+        onEditorChange={handleChange}
+        placeholder="Start typing..."
+        height={600}
+        disabled={false}
+        plugins={[
+          'advlist', 'autolink', 'lists', 'link', 'image',
+          'charmap', 'preview', 'anchor', 'searchreplace',
+          'visualblocks', 'code', 'fullscreen', 'insertdatetime',
+          'media', 'table', 'help', 'wordcount'
+        ]}
+        toolbar="undo redo | formatselect | bold italic backcolor |
+                alignleft aligncenter alignright alignjustify |
+                bullist numlist outdent indent | removeformat | help"
+        init={{
+          menubar: true,
+          statusbar: true,
+          branding: false,
+          content_style: 'body { font-family: Arial, sans-serif; font-size: 14px }'
+        }}
+        ref={editorRef}
+      />
+
+      <button onClick={insertCustomContent}>
+        Insert Custom Content
+      </button>
+    </div>
+  );
+}
+```
+
+## Migrating from TinyMCE React
+
+**No changes needed!** TrendyMC's React component is API-compatible with `@tinymce/tinymce-react`.
+
+Just replace the import:
+
+```jsx
+// Before
+import { Editor } from '@tinymce/tinymce-react';
+
+// After
+import { Editor } from 'trendymc';
+
+// Everything else stays the same!
+```
 
 ### Using with npm/ES6 Modules
 
