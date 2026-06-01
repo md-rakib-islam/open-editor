@@ -2,15 +2,18 @@ import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react
 
 /**
  * TrendyMC Editor Component for React
+ * Compatible with TinyMCE React component API
  *
  * @param {Object} props - Component props
  * @param {string} props.id - Unique ID for the editor instance
  * @param {string} props.initialValue - Initial content for the editor
- * @param {string} props.value - Controlled value (use with onChange)
- * @param {Function} props.onInit - Callback when editor initializes
- * @param {Function} props.onChange - Callback when content changes
+ * @param {string} props.value - Controlled value (use with onChange/onEditorChange)
+ * @param {Function} props.onInit - Callback when editor initializes (evt, editor)
+ * @param {Function} props.onChange - Callback when content changes (modern API)
+ * @param {Function} props.onEditorChange - Callback when content changes (TinyMCE API)
  * @param {Function} props.onBlur - Callback when editor loses focus
  * @param {Function} props.onFocus - Callback when editor gains focus
+ * @param {string} props.placeholder - Placeholder text
  * @param {number} props.height - Editor height in pixels
  * @param {boolean} props.inline - Enable inline mode
  * @param {boolean} props.disabled - Disable the editor
@@ -25,8 +28,10 @@ const Editor = forwardRef((props, ref) => {
     value,
     onInit,
     onChange,
+    onEditorChange, // TinyMCE-style prop
     onBlur,
     onFocus,
+    placeholder,
     height = 500,
     inline = false,
     disabled = false,
@@ -43,6 +48,9 @@ const Editor = forwardRef((props, ref) => {
   const elementRef = useRef(null);
   const editorRef = useRef(null);
   const isControlled = value !== undefined;
+
+  // Support both onChange and onEditorChange
+  const handleContentChange = onEditorChange || onChange;
 
   // Expose editor methods to parent via ref
   useImperativeHandle(ref, () => ({
@@ -72,6 +80,7 @@ const Editor = forwardRef((props, ref) => {
       menubar: init.menubar !== undefined ? init.menubar : true,
       statusbar: init.statusbar !== undefined ? init.statusbar : true,
       branding: init.branding !== undefined ? init.branding : false,
+      placeholder: placeholder || init.placeholder,
       ...init,
       setup: (editor) => {
         editorRef.current = editor;
@@ -81,31 +90,33 @@ const Editor = forwardRef((props, ref) => {
           init.setup(editor);
         }
 
-        // Handle initialization
-        editor.on('init', () => {
+        // Handle initialization - TinyMCE passes (evt, editor)
+        editor.on('init', (evt) => {
           if (onInit) {
-            onInit(editor);
+            // Support TinyMCE-style (evt, editor) signature
+            onInit(evt, editor);
           }
         });
 
         // Handle content changes
         editor.on('change keyup setcontent', () => {
-          if (onChange) {
-            onChange(editor.getContent(), editor);
+          if (handleContentChange) {
+            // TinyMCE passes (content, editor)
+            handleContentChange(editor.getContent(), editor);
           }
         });
 
         // Handle blur event
         if (onBlur) {
-          editor.on('blur', () => {
-            onBlur(editor);
+          editor.on('blur', (evt) => {
+            onBlur(evt, editor);
           });
         }
 
         // Handle focus event
         if (onFocus) {
-          editor.on('focus', () => {
-            onFocus(editor);
+          editor.on('focus', (evt) => {
+            onFocus(evt, editor);
           });
         }
       }
