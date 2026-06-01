@@ -54,10 +54,22 @@ const Editor = forwardRef((props, ref) => {
 
   // Expose editor methods to parent via ref
   useImperativeHandle(ref, () => ({
-    getContent: () => editorRef.current?.getContent() || '',
-    setContent: (content) => editorRef.current?.setContent(content),
-    insertContent: (content) => editorRef.current?.insertContent(content),
-    focus: () => editorRef.current?.focus(),
+    getContent: () => (editorRef.current ? editorRef.current.getContent() : ''),
+    setContent: (content) => {
+      if (editorRef.current) {
+        editorRef.current.setContent(content);
+      }
+    },
+    insertContent: (content) => {
+      if (editorRef.current) {
+        editorRef.current.insertContent(content);
+      }
+    },
+    focus: () => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    },
     getEditor: () => editorRef.current,
   }));
 
