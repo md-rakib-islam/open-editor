@@ -38,12 +38,12 @@
   "license": "GPL-2.0-or-later",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/trendymc.git"
+    "url": "git+https://github.com/md-rakib-islam/open-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/trendymc/issues"
+    "url": "https://github.com/md-rakib-islam/open-editor/issues"
   },
-  "homepage": "https://github.com/yourusername/trendymc#readme",
+  "homepage": "https://github.com/md-rakib-islam/open-editor#readme",
   "engines": {
     "node": ">=12.0.0"
   },
